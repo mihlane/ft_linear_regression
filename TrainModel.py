@@ -1,36 +1,73 @@
 import pandas as pd
-
-theta0 = 0
-theta1 = 0
-def estimated_price(mileage):
-    est_price  = theta0 + (theta1 * mileage)
-    return est_price
-data = pd.read_csv("data.csv")
-print(data.__len__())
+import re
+import sys
+from pathlib import Path
+from PredictPrice import isthere, estimated_price
+import numpy as np
 
 def get_thetat():
-    tmpzero = {}
-    tmpone = {}
-    with open("data.csv", "r") as file:
-        tmpzero, tmpone = file.read([tmpzero, tmpone])
-    print(tmpone, tmpone)
-    # learning_rate = 1
-    # m = 5
-    # thata = 0
-    # thataa = 0
-    # for i in m:
-    #     thata += (estimated_price(mileage[i]) - price[i])
-    #     thataa += (estimated_price(mileage[i]) - price[i]) * mileage[i]
-    # tmpzero = learning_rate * (1/ m) * thata
-    # tmpone =  learning_rate * (1/ m) * thataa
-    # with open("output.txt", "w") as file:
-    #     file.write([tmpzero, tmpone])    
+    tmpzero = 0.0
+    tmpone = 0.0
+    
+    # try:
+    data = np.loadtxt("data.csv", delimiter=",", skiprows=1)
+    km_data = data[:, 0]
+    price_data = data[:, 1]
+		# return mileages, prices
+    # except:
+	# 	print('⛔ Error: Invalid Data')
+	# 	exit()
+          
+    # df = pd.read_csv("data.csv")
+    # km_data = df['km'].tolist()
+    # price_data = df['price'].tolist()
 
-# index  = 0 
-def main():
-    precision = 30000
+    # print("KM data:", km_data)
+    # print("Price data:", price_data)
+    # with open("data.csv", "r") as file:
+    #     tmpzero, tmpone = file.read([tmpzero, tmpone])
+    # print(tmpone, tmpone)
+    learning_rate = 0.001
+    m = km_data.__len__()
+    # print(m)
+    isthere("theta")
+    with open("theta", "r") as f:
+        file = f.read()
+        f.close()
+        # print(file)
+        file = file.split("\n")
+        tmpzero = float(file[0])
+        tmpone = float(file[1])
+    # print("hello",tmpzero, "m = ", m)
+    # tmpzero = 
+    # thataa = 0
+    delta0 = 0.0
+    delta1 = 0.0
+    precision = 1000
     for i in range(precision):
-        get_thetat()
+        # print("type is", type(km_data))
+        pred = (estimated_price(km_data, delta0,delta1))
+        tmpzero = pred - price_data
+        delta0 -=  (learning_rate * (1.0/ m)) * np.sum(tmpzero)
+        delta1 -= (learning_rate * (1.0/ m)) * np.sum(tmpzero * km_data)
+        # PrintedThetaOne =  -((learning_rate * (1/ m)) * tmpone)
+        # PrintedThetaZero = -((learning_rate * (1/ m)) * tmpzero)
+        # print(tmpzero)
+    # print(tmpone)
+    print("theta",delta0)
+    print("tcd heta",delta1)
+    with open("theta", "w") as file:
+        file.write(delta0.__str__())
+        file.write('\n')  # Add newline between them
+        file.write(delta1.__str__())
+    # with open("output.txt", "w") as file:
+    #     file.write([PrintedThetaZero.__str__(), PrintedThetaOne.__str__()])
+
+
+def main():
+    # precision = 1000
+    # for i in range(precision):
+    get_thetat()
 
 if __name__=="__main__":
     main()

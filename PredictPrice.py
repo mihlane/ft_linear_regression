@@ -1,45 +1,35 @@
-import re
 import sys
 from pathlib import Path
 
 def isthere(path):
     my_file = Path(path)
-    if my_file.exists() == False:
-        print(f'Cant find {path}')
-        sys.exit(1)
-
-def get_type(value):
-    if re.fullmatch(r"\d*\.\d+", value):
-        return float(value)
-    elif re.fullmatch(r"\d+", value):
-        return int(value)
-    else:
-        print('Please enter a number!')
+    if not my_file.exists():
+        print(f"Can't find {path}")
         sys.exit(1)
 
 def estimated_price(mileage):
     isthere("theta")
-    with open("theta", "r") as f:
-        file = f.read()
-        f.close()
-        print(file)
-        file = file.split("\n")
-        theta0 = float(file[0])
-        theta1 = float(file[1])
-    est_price  = theta0 + (theta1 * mileage)
-    # print(type(est_price), type(theta0), est_price)
-    # est_price = get_type(est_price)
-    return est_price
+    isthere("scaling_params")
 
+    with open("theta", "r") as f:
+        theta0 = float(f.readline().strip())
+        theta1 = float(f.readline().strip())
+
+    with open("scaling_params", "r") as f:
+        km_min = float(f.readline().strip())
+        km_max = float(f.readline().strip())
+
+    # Normalize mileage
+    normalized_mileage = (mileage - km_min) / (km_max - km_min)
+    return theta0 + (theta1 * normalized_mileage)
 
 def main():
-    value = input("> Please entre your mileage: ")
-    value = get_type(value)
-    predected_price = estimated_price(value)
-    if predected_price < 200:
-        print("the predected price may not be reliable")
-    # else:
-    print(f"the estimated price is : {predected_price}")
+    try:
+        mileage = float(input("Enter mileage (km): "))
+        price = estimated_price(mileage)
+        print(f"Estimated price: €{price:.2f}")
+    except ValueError:
+        print("Please enter a valid number.")
 
 if __name__ == "__main__":
     main()
