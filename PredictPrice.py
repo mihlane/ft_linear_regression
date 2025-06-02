@@ -26,6 +26,9 @@ def estimated_price(mileage):
 def main():
     try:
         mileage = float(input("Enter mileage (km): "))
+        if mileage > 413800:
+            print("the mileage is too big please try something a little bit smaller \n the maximum is 413800 KM")
+            exit(0)
         price = estimated_price(mileage)
         print(f"Estimated price: €{price:.2f}")
     except ValueError:
